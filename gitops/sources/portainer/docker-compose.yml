@@ -1,0 +1,79 @@
+---
+# Portainer EE - Docker/Kubernetes Management UI (Business Edition)
+# https://docs.portainer.io/start/install/server/docker/linux
+# Portainer Stack deployment - persistent data via named volume
+
+services:
+  portainer:
+    image: portainer/portainer-ee:${PORTAINER_IMAGE_TAG:-latest}
+    container_name: portainer
+    restart: unless-stopped
+
+    env_file:
+      - stack.env
+
+    environment:
+      # EE license key — required for Portainer Business Edition.
+      # Obtain from https://www.portainer.io/take-3 or your account portal.
+      PORTAINER_LICENSE_KEY: ${PORTAINER_LICENSE_KEY:?Set PORTAINER_LICENSE_KEY in stack.env or the Portainer stack environment variables}
+
+    command:
+      # HTTP port Portainer listens on inside the container
+      - --http-port=${PORTAINER_HTTP_PORT:-9000}
+      # HTTPS / tunnel port (used by Edge Agents)
+      - --tunnel-port=${PORTAINER_TUNNEL_PORT:-8000}
+      # Disable the Portainer in-app analytics ping
+      - --no-analytics
+
+    ports:
+      # Web UI — scoped to localhost; put a reverse proxy in front for TLS
+      - "${PORTAINER_BIND_ADDR:-127.0.0.1}:${PORTAINER_HOST_HTTP_PORT:-9000}:${PORTAINER_HTTP_PORT:-9000}"
+      # Edge Agent tunnel — must be reachable by edge agents
+      - "${PORTAINER_TUNNEL_BIND_ADDR:-0.0.0.0}:${PORTAINER_HOST_TUNNEL_PORT:-8000}:${PORTAINER_TUNNEL_PORT:-8000}"
+
+    volumes:
+      # Portainer persistent state (users, endpoints, stacks, settings)
+      - portainer_data:/data
+      # Docker socket — required to manage the local Docker engine
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - portainer
+
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT:-256m}
+          cpus: "${CPU_LIMIT:-0.5}"
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      # Required to bind to privileged ports inside the container
+      - NET_BIND_SERVICE
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider",
+             "http://localhost:${PORTAINER_HTTP_PORT:-9000}/api/system/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  portainer_data:
+    driver: local
+
+networks:
+  portainer:
+    name: ${PORTAINER_NETWORK_NAME:-portainer}
+    driver: bridge
+    external: false
