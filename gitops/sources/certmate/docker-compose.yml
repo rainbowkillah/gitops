@@ -1,20 +1,23 @@
----
-# CertMate - SSL Certificate Manager
+# CertMate — Portainer GitOps stack
 # https://www.certmate.org/docs/docker-deployment.html
-# Portainer Stack deployment - use pre-built image from Docker Hub
 
 services:
   certmate:
-    image: fabriziosalmi/certmate:${CERTMATE_VERSION:-latest}
+    # Pin upgrades by changing this tag in Git.
+    image: fabriziosalmi/certmate:2.48.3
     container_name: certmate
     restart: unless-stopped
 
+    # Portainer reads these runtime settings from the tracked stack.env file.
+    # Keep secrets in Portainer's stack environment variables instead of Git.
     env_file:
       - stack.env
 
+    # Host-local access; put a host-based reverse proxy in front for remote access.
     ports:
-      - "${CERTMATE_PORT_BIND:-127.0.0.1}:${CERTMATE_HOST_PORT:-8001}:${PORT:-8001}"
+      - "127.0.0.1:8000:8000"
 
+    # CertMate stores all application state in these persistent directories.
     volumes:
       - certmate_data:/app/data
       - certmate_certificates:/app/certificates
@@ -24,11 +27,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${MEMORY_LIMIT:-512m}
-          cpus: "${CPU_LIMIT:-1.0}"
+          memory: 512m
+          cpus: "1.0"
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8001}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -40,10 +43,8 @@ services:
         max-size: "10m"
         max-file: "3"
 
-    # Drop all Linux capabilities (matches upstream compose hardening)
     cap_drop:
       - ALL
-
     security_opt:
       - no-new-privileges:true
 
