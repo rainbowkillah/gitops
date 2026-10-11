@@ -1,0 +1,58 @@
+---
+# CertMate - SSL Certificate Manager
+# https://www.certmate.org/docs/docker-deployment.html
+# Portainer Stack deployment - use pre-built image from Docker Hub
+
+services:
+  certmate:
+    image: fabriziosalmi/certmate:${CERTMATE_VERSION:-latest}
+    container_name: certmate
+    restart: unless-stopped
+
+    env_file:
+      - stack.env
+
+    ports:
+      - "${CERTMATE_PORT_BIND:-127.0.0.1}:${CERTMATE_HOST_PORT:-8000}:${PORT:-8000}"
+
+    volumes:
+      - certmate_data:/app/data
+      - certmate_certificates:/app/certificates
+      - certmate_logs:/app/logs
+      - certmate_backups:/app/backups
+
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT:-512m}
+          cpus: "${CPU_LIMIT:-1.0}"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Drop all Linux capabilities (matches upstream compose hardening)
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  certmate_data:
+    driver: local
+  certmate_certificates:
+    driver: local
+  certmate_logs:
+    driver: local
+  certmate_backups:
+    driver: local

@@ -1,0 +1,91 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:${CLOUDFLARED_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    command:
+      - tunnel
+      - --loglevel=${TUNNEL_LOGLEVEL:-info}
+      - --output=${TUNNEL_LOG_OUTPUT:-default}
+      - --metrics=${TUNNEL_METRICS:-0.0.0.0:20241}
+      - --protocol=${TUNNEL_TRANSPORT_PROTOCOL:-auto}
+      - --edge-ip-version=${TUNNEL_EDGE_IP_VERSION:-auto}
+      - --grace-period=${TUNNEL_GRACE_PERIOD:-30s}
+      - --retries=${TUNNEL_RETRIES:-5}
+      - --no-autoupdate
+      - run
+    environment:
+      # Required — paste a token from Cloudflare Zero Trust > Tunnels
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in the Portainer stack environment variables or stack.env}
+
+      # ── Logging ────────────────────────────────────────────────────────────
+      # TUNNEL_LOGLEVEL and TUNNEL_LOG_OUTPUT are passed via command above
+      # to keep them visible in the compose file; setting them as env vars
+      # here as well keeps parity with the CF docs mapping.
+      TUNNEL_LOGLEVEL:            ${TUNNEL_LOGLEVEL:-info}
+      TUNNEL_LOG_OUTPUT:          ${TUNNEL_LOG_OUTPUT:-default}
+
+      # ── Connection ─────────────────────────────────────────────────────────
+      TUNNEL_TRANSPORT_PROTOCOL:  ${TUNNEL_TRANSPORT_PROTOCOL:-auto}
+      TUNNEL_EDGE_IP_VERSION:     ${TUNNEL_EDGE_IP_VERSION:-auto}
+      TUNNEL_GRACE_PERIOD:        ${TUNNEL_GRACE_PERIOD:-30s}
+      TUNNEL_RETRIES:             ${TUNNEL_RETRIES:-5}
+      TUNNEL_METRICS:             ${TUNNEL_METRICS:-0.0.0.0:20241}
+      NO_AUTOUPDATE:              "true"
+
+      # ── Optional / commented out by default ────────────────────────────────
+      # Uncomment and set in stack.env to enable these features.
+      #
+      # Route all connections through US data centers only (or "us" for FedRAMP)
+      # TUNNEL_REGION: ${TUNNEL_REGION:-}
+      #
+      # Lock quic to post-quantum key agreements only (no non-PQ fallback)
+      # TUNNEL_POST_QUANTUM: ${TUNNEL_POST_QUANTUM:-}
+      #
+      # Force a specific outgoing IP for the cloudflared → Cloudflare connection
+      # TUNNEL_EDGE_BIND_ADDRESS: ${TUNNEL_EDGE_BIND_ADDRESS:-}
+      #
+      # Custom DNS resolvers (ip:port format, requires cloudflared >= 2025.7.0)
+      # TUNNEL_DNS_RESOLVER_ADDRS: ${TUNNEL_DNS_RESOLVER_ADDRS:-}
+      #
+      # Custom tag(s) to identify this connector in the dashboard (KEY=VALUE)
+      # TUNNEL_TAG: ${TUNNEL_TAG:-}
+      #
+      # Write a PID file (useful for scripting/health checks on the host)
+      # TUNNEL_PIDFILE: ${TUNNEL_PIDFILE:-}
+
+    # Expose the Prometheus metrics port to the Docker network only.
+    # Remove or scope this if you do not need external metrics scraping.
+    ports:
+      - "127.0.0.1:20241:20241"
+
+    networks:
+      - cloudflared
+
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+
+    healthcheck:
+      # cloudflared exposes /ready on the metrics port when the tunnel is up
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:20241", "ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  # Shared network — attach other stacks/services to this network so
+  # cloudflared can reach them by their container service name.
+  # e.g. origin: http://my-app:8080
+  cloudflared:
+    name: ${CLOUDFLARED_NETWORK_NAME:-cloudflared}
+    driver: bridge
+    external: false
