@@ -13,7 +13,7 @@ services:
       - stack.env
 
     ports:
-      - "${CERTMATE_PORT_BIND:-127.0.0.1}:${CERTMATE_HOST_PORT:-8000}:${PORT:-8000}"
+      - "${CERTMATE_PORT_BIND:-127.0.0.1}:${CERTMATE_HOST_PORT:-8001}:${PORT:-8001}"
 
     volumes:
       - certmate_data:/app/data
@@ -28,7 +28,7 @@ services:
           cpus: "${CPU_LIMIT:-1.0}"
 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8000}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8001}/health"]
       interval: 30s
       timeout: 10s
       retries: 3

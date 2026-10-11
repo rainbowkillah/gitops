@@ -10,7 +10,7 @@ Create the GitOps stack folder for the unified CertMate + cloudflared mesh. Deli
 
 - [x] 1. Create the stack folder structure
   - Create `gitops/sources/ca-certmate-cloudflare-mesh/` directory (the three files below will create it implicitly).
-  - Confirm the directory mirrors the layout of `gitops/sources/cloudflare/` and `gitops/sources/certmate/`: one compose file, one env template, one README — no subdirectories.
+  - Confirm the directory mirrors the layout of `gitops/sources/cloudflared/` and `gitops/sources/certmate/`: one compose file, one env template, one README — no subdirectories.
   - _Requirements: 1.1, 1.2_
 
 - [ ] 2. Write `docker-compose.yml`
