@@ -7,6 +7,257 @@
         "chatSessionId": "sess_e83ebd7b-7926-47d4-af8b-398a7f64565a",
         "timestamp": 1791707744382
       }
+    ],
+    "2.1 Define the CertMate service": [
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733706378
+      },
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733791581
+      }
+    ],
+    "2.2 Define the cloudflared service": [
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733708637
+      },
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733793586
+      }
+    ],
+    "2.3 Declare the `certmesh` network and named volumes": [
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733710401
+      },
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733795487
+      }
+    ],
+    "2. Write `docker-compose.yml`": [
+      {
+        "executionId": "2d2eb51e-0bf9-4d76-bfba-6c2e1993cf5e",
+        "chatSessionId": "sess_a795c589-3f50-4271-b5b2-a7a7152765c3",
+        "timestamp": 1791733795536
+      }
+    ],
+    "3.1 Document all non-secret variables with defaults": [
+      {
+        "executionId": "deb481f5-92bd-4c8e-88b6-22003450fb73",
+        "chatSessionId": "sess_16e64e44-c116-4dc3-8786-43b5270ae684",
+        "timestamp": 1791733884867
+      },
+      {
+        "executionId": "deb481f5-92bd-4c8e-88b6-22003450fb73",
+        "chatSessionId": "sess_16e64e44-c116-4dc3-8786-43b5270ae684",
+        "timestamp": 1791733922173
+      }
+    ],
+    "3.2 Add secret variables with empty values and Portainer UI instructions": [
+      {
+        "executionId": "deb481f5-92bd-4c8e-88b6-22003450fb73",
+        "chatSessionId": "sess_16e64e44-c116-4dc3-8786-43b5270ae684",
+        "timestamp": 1791733886787
+      },
+      {
+        "executionId": "deb481f5-92bd-4c8e-88b6-22003450fb73",
+        "chatSessionId": "sess_16e64e44-c116-4dc3-8786-43b5270ae684",
+        "timestamp": 1791733924165
+      }
+    ],
+    "3. Write `stack.env` template": [
+      {
+        "executionId": "deb481f5-92bd-4c8e-88b6-22003450fb73",
+        "chatSessionId": "sess_16e64e44-c116-4dc3-8786-43b5270ae684",
+        "timestamp": 1791733924211
+      }
+    ],
+    "4. Write `README.md`": [
+      {
+        "executionId": "6cc07db4-8173-417f-8939-5c8cd516e586",
+        "chatSessionId": "sess_13bca9ce-e599-48f3-b2ad-7bac3263dc39",
+        "timestamp": 1791733992521
+      },
+      {
+        "executionId": "6cc07db4-8173-417f-8939-5c8cd516e586",
+        "chatSessionId": "sess_13bca9ce-e599-48f3-b2ad-7bac3263dc39",
+        "timestamp": 1791734069899
+      }
+    ],
+    "5.1 Add a compose-level label or comment in `docker-compose.yml` confirming the CertMate web UI port binding exposes the private CA dashboard": [
+      {
+        "executionId": "e5ee67af-8799-4786-9458-568575b7141a",
+        "chatSessionId": "sess_b1244bf6-3bf5-4afe-910f-069934f3fe0d",
+        "timestamp": 1791734250200
+      },
+      {
+        "executionId": "e5ee67af-8799-4786-9458-568575b7141a",
+        "chatSessionId": "sess_b1244bf6-3bf5-4afe-910f-069934f3fe0d",
+        "timestamp": 1791734300903
+      }
+    ],
+    "5.2 Document the web UI private CA workflow in `README.md`": [
+      {
+        "executionId": "e5ee67af-8799-4786-9458-568575b7141a",
+        "chatSessionId": "sess_b1244bf6-3bf5-4afe-910f-069934f3fe0d",
+        "timestamp": 1791734251972
+      },
+      {
+        "executionId": "e5ee67af-8799-4786-9458-568575b7141a",
+        "chatSessionId": "sess_b1244bf6-3bf5-4afe-910f-069934f3fe0d",
+        "timestamp": 1791734305102
+      }
+    ],
+    "5. Verify private CA accessibility — web UI path (Req 4.1)": [
+      {
+        "executionId": "e5ee67af-8799-4786-9458-568575b7141a",
+        "chatSessionId": "sess_b1244bf6-3bf5-4afe-910f-069934f3fe0d",
+        "timestamp": 1791734305162
+      }
+    ],
+    "6.1 Add a comment block in `docker-compose.yml` documenting the CertMate API endpoint for internal certificate issuance": [
+      {
+        "executionId": "61218a11-2f54-4789-8d1d-951de7f318c5",
+        "chatSessionId": "sess_52dcbe3b-df34-40cb-96d3-2dfe208e453c",
+        "timestamp": 1791734346869
+      },
+      {
+        "executionId": "61218a11-2f54-4789-8d1d-951de7f318c5",
+        "chatSessionId": "sess_52dcbe3b-df34-40cb-96d3-2dfe208e453c",
+        "timestamp": 1791734373547
+      }
+    ],
+    "6.2 Document the API private CA workflow in `README.md`": [
+      {
+        "executionId": "61218a11-2f54-4789-8d1d-951de7f318c5",
+        "chatSessionId": "sess_52dcbe3b-df34-40cb-96d3-2dfe208e453c",
+        "timestamp": 1791734348698
+      },
+      {
+        "executionId": "61218a11-2f54-4789-8d1d-951de7f318c5",
+        "chatSessionId": "sess_52dcbe3b-df34-40cb-96d3-2dfe208e453c",
+        "timestamp": 1791734376779
+      }
+    ],
+    "6. Verify private CA accessibility — API path (Req 4.2)": [
+      {
+        "executionId": "61218a11-2f54-4789-8d1d-951de7f318c5",
+        "chatSessionId": "sess_52dcbe3b-df34-40cb-96d3-2dfe208e453c",
+        "timestamp": 1791734376855
+      }
+    ],
+    "7. Checkpoint — validate compose file and gitignore": [
+      {
+        "executionId": "f55be235-a318-44b0-8d37-689d9a47158a",
+        "chatSessionId": "sess_3e8440c7-ce91-4b93-b26c-72f611fdc86c",
+        "timestamp": 1791736162827
+      },
+      {
+        "executionId": "f55be235-a318-44b0-8d37-689d9a47158a",
+        "chatSessionId": "sess_3e8440c7-ce91-4b93-b26c-72f611fdc86c",
+        "timestamp": 1791736214177
+      }
+    ],
+    "8.1 Write test script for Property 1 — Security hardening invariant": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736259147
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736473866
+      }
+    ],
+    "8.2 Write test script for Property 2 — Volume declaration consistency": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736260907
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736475713
+      }
+    ],
+    "8.3 Write test script for Property 3 — Required-secret substitution syntax": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736263016
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736477677
+      }
+    ],
+    "8.4 Write test script for Property 4 — Committed stack.env has empty secret values": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736264839
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736481296
+      }
+    ],
+    "8.5 Write test script for Property 5 — GUNICORN_TIMEOUT ≥ 300": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736266682
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736483333
+      }
+    ],
+    "8.6 Place all test scripts under `gitops/sources/ca-certmate-cloudflare-mesh/tests/` and add a short runner comment at the top of each file explaining how to execute it (e.g., `bash tests/test_p1_hardening.sh`).": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736268555
+      },
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736485776
+      }
+    ],
+    "8. Add property-based test scripts": [
+      {
+        "executionId": "2fbe6288-82f3-4ae0-a6f5-761278e2193e",
+        "chatSessionId": "sess_84213a7e-2c10-4792-a7a2-57f72d94c088",
+        "timestamp": 1791736485866
+      }
+    ],
+    "9. Final checkpoint — Ensure all tests pass": [
+      {
+        "executionId": "69720f1e-5476-4148-a4af-40f4ebfe2096",
+        "chatSessionId": "sess_8f86857b-b642-44ca-9da6-75b0ee31929f",
+        "timestamp": 1791736959989
+      },
+      {
+        "executionId": "69720f1e-5476-4148-a4af-40f4ebfe2096",
+        "chatSessionId": "sess_8f86857b-b642-44ca-9da6-75b0ee31929f",
+        "timestamp": 1791737009046
+      }
     ]
   }
 }

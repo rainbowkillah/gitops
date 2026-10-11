@@ -1,2 +1,3 @@
 .env
+gitops/**/*.env
 gitops/backups/*

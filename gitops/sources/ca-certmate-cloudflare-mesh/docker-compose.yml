@@ -1,0 +1,170 @@
+---
+# ca-certmate-cloudflare-mesh
+# Unified CertMate + cloudflared stack on a dedicated certmesh bridge network.
+#
+# CertMate dual role:
+#   - Public CA client  — DNS-01 ACME challenges via Cloudflare API for
+#                         rainbowsmokeofficial.com and mrrainbowsmoke.com
+#   - Private CA        — issues internal TLS certs for host.docker.internal
+#                         and other certmesh services, no external ACME contact
+#
+# cloudflared routes public traffic from the Cloudflare edge to internal origins
+# by container service name on the certmesh network (e.g. http://certmate:8000).
+#
+# Secrets (TUNNEL_TOKEN, CLOUDFLARE_TOKEN, API_BEARER_TOKEN, SECRET_KEY,
+# CERTMATE_BACKUP_PASSPHRASE) must be supplied via the Portainer stack
+# environment UI — never commit populated values to source control.
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # CertMate — certificate authority and ACME client
+  #
+  # Web UI (Private CA — Req 4.1):
+  #   Accessible at http://127.0.0.1:8000 on the host (loopback only).
+  #   Navigate to the Private CA section to issue internal certificates for
+  #   host.docker.internal or other mesh service names interactively via the
+  #   browser without using the API.
+  #
+  # API (Private CA — Req 4.2):
+  #   POST /api/certificates
+  #   Authorization: Bearer <API_BEARER_TOKEN>
+  #   Content-Type: application/json
+  #   Body: { "domain": "host.docker.internal", "type": "internal" }
+  #
+  #   Example:
+  #     curl -sf -X POST http://127.0.0.1:8000/api/certificates \
+  #       -H "Authorization: Bearer $API_BEARER_TOKEN" \
+  #       -H "Content-Type: application/json" \
+  #       -d '{"domain":"host.docker.internal","type":"internal"}'
+  #
+  #   Automated tooling uses API_BEARER_TOKEN (supplied via Portainer stack
+  #   environment) to issue internal certs without manual UI interaction.
+  # ---------------------------------------------------------------------------
+  certmate:
+    image: fabriziosalmi/certmate:${CERTMATE_VERSION:-latest}
+    restart: unless-stopped
+
+    env_file:
+      - stack.env
+
+    environment:
+      # Required — Cloudflare API token with DNS Edit permissions for DNS-01 challenges.
+      # Obtain from: Cloudflare dashboard > My Profile > API Tokens > Create Token
+      # Supply via Portainer stack environment UI; never commit the value here.
+      CLOUDFLARE_TOKEN: ${CLOUDFLARE_TOKEN:?Set CLOUDFLARE_TOKEN in the Portainer stack environment}
+
+    ports:
+      # Loopback-only binding — CertMate UI is NOT exposed on external interfaces.
+      - "${CERTMATE_PORT_BIND:-127.0.0.1}:${CERTMATE_HOST_PORT:-8000}:${PORT:-8000}"
+
+    volumes:
+      - certmate_data:/app/data
+      - certmate_certificates:/app/certificates
+      - certmate_logs:/app/logs
+      - certmate_backups:/app/backups
+
+    networks:
+      - certmesh
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT:-512m}
+          cpus: "${CPU_LIMIT:-1.0}"
+
+  # ---------------------------------------------------------------------------
+  # cloudflared — Cloudflare Zero Trust tunnel
+  #
+  # Routes public traffic from the Cloudflare edge to internal origins by
+  # container service name on the certmesh network.
+  # Metrics endpoint: http://127.0.0.1:20241/metrics (loopback only).
+  # ---------------------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:${CLOUDFLARED_IMAGE_TAG:-latest}
+    restart: unless-stopped
+
+    command:
+      - tunnel
+      - --loglevel=${TUNNEL_LOGLEVEL:-info}
+      - --metrics=0.0.0.0:20241
+      - --no-autoupdate
+      - run
+
+    environment:
+      # Required — tunnel token from Cloudflare Zero Trust > Networking > Tunnels.
+      # Select tunnel > Add a replica > copy the token value.
+      # Supply via Portainer stack environment UI; never commit the value here.
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?Set TUNNEL_TOKEN in the Portainer stack environment}
+
+    ports:
+      # Prometheus metrics — scoped to localhost only.
+      - "127.0.0.1:20241:20241"
+
+    networks:
+      - certmesh
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    read_only: true
+
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:20241", "ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# -----------------------------------------------------------------------------
+# Network
+# -----------------------------------------------------------------------------
+networks:
+  certmesh:
+    name: ${CERTMESH_NETWORK_NAME:-certmesh}
+    driver: bridge
+    external: false
+
+# -----------------------------------------------------------------------------
+# Volumes
+# All four volumes are scoped to this stack. If a standalone certmate stack was
+# previously deployed, the operator can reuse its volumes by setting the volume
+# names in stack.env; otherwise fresh volumes are created automatically.
+# -----------------------------------------------------------------------------
+volumes:
+  certmate_data:
+    driver: local
+  certmate_certificates:
+    driver: local
+  certmate_logs:
+    driver: local
+  certmate_backups:
+    driver: local
