@@ -44,8 +44,9 @@ services:
       - mesh_data:/var/lib/cloudflare-warp
 
     healthcheck:
-      # warp-cli status exits 0 when connected, non-zero otherwise
-      test: ["CMD", "warp-cli", "status"]
+      # --accept-tos is required for all warp-cli invocations in headless/container mode.
+      # Without it every probe triggers a TOS error regardless of connection state.
+      test: ["CMD", "warp-cli", "--accept-tos", "status"]
       interval: 30s
       timeout: 10s
       retries: 3
