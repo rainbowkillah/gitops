@@ -1,22 +1,62 @@
+---
+# Cloudflare Mesh Node
+# https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-mesh/guides/run-mesh-in-containers/
+# Runs the Cloudflare One Client warp-svc daemon headlessly.
+# The node connects outbound to Cloudflare — no inbound firewall rules required.
+
 services:
   cloudflare-mesh:
-    image: cloudflare/mesh:latest
+    image: cloudflare/mesh:${MESH_IMAGE_TAG:-latest}
     container_name: cloudflare-mesh
+    restart: unless-stopped
+
+    env_file:
+      - stack.env
+
+    environment:
+      # Required — node token from Cloudflare dashboard: Networking > Mesh > Add node
+      MESH_NODE_TOKEN: ${MESH_NODE_TOKEN:?Set MESH_NODE_TOKEN in stack.env or the Portainer stack environment variables}
+
+      # Source NAT: translates the Mesh CGNAT source IP (100.96.x.x) to the node's
+      # local interface IP so return traffic routes correctly without VPC route changes.
+      # Set to false only if your network already has return routes to 100.96.0.0/12.
+      # Default: true
+      SRCNAT_ENABLED: ${SRCNAT_ENABLED:-true}
+
+    # Required Linux capabilities for the warp-svc tunnel daemon
     cap_add:
-      - NET_ADMIN
-      - NET_RAW
+      - NET_ADMIN    # create/configure tunnel interface, routing, nftables rules
+      - NET_RAW      # raw-socket operations (e.g. ICMP); explicit although Docker grants it by default
+
+    # TUN device — required to create the WARP TUN interface
     devices:
       - /dev/net/tun:/dev/net/tun
-    environment:
-      MESH_NODE_TOKEN: ${MESH_NODE_TOKEN}
-      SRCNAT_ENABLED: "true"
+
+    # IP forwarding — required when the node forwards traffic for routed subnets
     sysctls:
       net.ipv4.ip_forward: "1"
       net.ipv6.conf.all.forwarding: "1"
       net.ipv6.conf.default.forwarding: "1"
+
     volumes:
+      # Persistent registration state — preserves Mesh identity across container recreation.
+      # Remove this volume only when you intentionally want to discard the registration.
       - mesh_data:/var/lib/cloudflare-warp
-    restart: unless-stopped
+
+    healthcheck:
+      # warp-cli status exits 0 when connected, non-zero otherwise
+      test: ["CMD", "warp-cli", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mesh_data:
+    driver: local
