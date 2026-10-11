@@ -4,7 +4,7 @@
 services:
   certmate:
     # Pin upgrades by changing this tag in Git.
-    image: fabriziosalmi/certmate:2.48.3
+    image: fabriziosalmi/certmate:latest
     container_name: certmate
     restart: unless-stopped
 
